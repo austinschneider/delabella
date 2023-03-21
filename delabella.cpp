@@ -462,7 +462,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 						else
 							vert_map[i] += c + 1;
 					}
-					
+
 				}
 			}
 			#endif
@@ -474,7 +474,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 
 			if (errlog_proc)
 				errlog_proc(errlog_file, "\r[100] sorting vertices (%lld ms)\n", (time1 - *sort_stamp) / 1000);
-			
+
 			*sort_stamp = time1;
 
 			if (points - w)
@@ -589,7 +589,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		bool colinear = f.sign0(); // hybrid
 		if (colinear)
 		{
-			vert_sub = (I *)malloc(sizeof(I) * ((size_t)i + 1));
+			vert_sub = (I *)std::malloc(sizeof(I) * ((size_t)i + 1));
 			if (!vert_sub)
 			{
 				if (errlog_proc)
@@ -736,7 +736,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 				Vert *vert_alloc;
 			} c;
 
-			vert_sub = (I *)malloc(sizeof(I) * ((size_t)i + 1));
+			vert_sub = (I *)std::malloc(sizeof(I) * ((size_t)i + 1));
 			if (!vert_sub)
 			{
 				if (errlog_proc)
@@ -779,7 +779,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 				}
 				*/
 
-				face_alloc = (Face *)malloc(sizeof(Face) * hull_faces);
+				face_alloc = (Face *)std::malloc(sizeof(Face) * hull_faces);
 
 				if (face_alloc)
 					max_faces = hull_faces;
@@ -1325,10 +1325,10 @@ struct CDelaBella2 : IDelaBella2<T, I>
 			}
 			*/
 
-			vert_alloc = (Vert *)malloc(sizeof(Vert) * points);
+			vert_alloc = (Vert *)std::malloc(sizeof(Vert) * points);
 
 			if (vert_alloc)
-				vert_map = (I *)malloc(sizeof(I) * (size_t)points);
+				vert_map = (I *)std::malloc(sizeof(I) * (size_t)points);
 
 			if (vert_alloc && vert_map)
 				max_verts = points;
@@ -1854,7 +1854,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 
 							Face *P = (Face *)(N->f[c]);
 							Face *Q = (Face *)(F->f[f]);
-							
+
 							// int p = P->f[0] == N ? 0 : P->f[1] == N ? 1 : 2;
 							// look for Nba edge
 							int p = P->v[0] == v0 ? 2 : P->v[1] == v0 ? 0 : 1;
@@ -2078,7 +2078,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 
 								//int q = Q->f[0] == F ? 0 : Q->f[1] == F ? 1 : 2;
 								// look for Fed edge
-								int q = Q->v[0] == v1 ? 2 : Q->v[1] == v1 ? 0 : 1;																		
+								int q = Q->v[0] == v1 ? 2 : Q->v[1] == v1 ? 0 : 1;
 
 								// do flip
 								N->v[a] = v1;
@@ -2460,7 +2460,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		Face **buf = 0;
 		if (!poly)
 		{
-			buf = (Face **)malloc(sizeof(Face *) * (size_t)out_verts / 3);
+			buf = (Face **)std::malloc(sizeof(Face *) * (size_t)out_verts / 3);
 			poly = (const typename IDelaBella2<T, I>::Simplex **)buf;
 			if (!poly)
 				return -1;
@@ -2736,7 +2736,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		first_dela_face = (Face *)poly[0];
 
 		if (buf)
-			free(buf);
+			std::free(buf);
 
 		if (errlog_proc)
 			errlog_proc(errlog_file, "\r[100] polygonizing (%lld ms)\n", (uSec() - time0) / 1000);
@@ -2986,7 +2986,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 							if (!stack->push)
 							{
 								// oops
-								stack->push = (Stk*)malloc(sizeof(Stk));
+								stack->push = (Stk*)std::malloc(sizeof(Stk));
 								if (!stack->push)
 									break;
 								stack->push->push = 0;
@@ -2994,7 +2994,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 							}
 							stack = stack->push;
 						}
-					
+
 						//Split(v, (I)(u - v));
 						stack->sub[depth].v = v;
 						stack->sub[depth].n = (I)(u - v);
@@ -3006,7 +3006,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 							if (!stack->push)
 							{
 								// oops
-								stack->push = (Stk*)malloc(sizeof(Stk));
+								stack->push = (Stk*)std::malloc(sizeof(Stk));
 								if (!stack->push)
 									break;
 								stack->push->push = 0;
@@ -3142,7 +3142,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 							if (!stack->push)
 							{
 								// oops
-								stack->push = (Stk*)malloc(sizeof(Stk));
+								stack->push = (Stk*)std::malloc(sizeof(Stk));
 								if (!stack->push)
 									break;
 								stack->push->push = 0;
@@ -3162,7 +3162,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 							if (!stack->push)
 							{
 								// oops
-								stack->push = (Stk*)malloc(sizeof(Stk));
+								stack->push = (Stk*)std::malloc(sizeof(Stk));
 								if (!stack->push)
 									break;
 								stack->push->push = 0;
@@ -3183,7 +3183,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 						// all verts are dups
 						// dont touch
 
-						// ehm, actually they can appear as dups (inexact rot) 
+						// ehm, actually they can appear as dups (inexact rot)
 						// but there may be a non dup hidden in the middle
 						struct
 						{
@@ -3224,7 +3224,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 				while (stack)
 				{
 					Stk* s = stack->push;
-					free(stack);
+                    std::free(stack);
 					stack = s;
 				}
 
@@ -3285,22 +3285,26 @@ struct CDelaBella2 : IDelaBella2<T, I>
 
 	virtual void Destroy()
 	{
-		if (vert_map)
-			free(vert_map);
+		if (vert_map) {
+			std::free(vert_map);
+            vert_map = 0;
+        }
 
 		if (face_alloc)
 		{
 			// delete [] face_alloc;
-			free(face_alloc);
+            std::free(face_alloc);
+            face_alloc = 0;
 		}
 
 		if (vert_alloc)
 		{
 			// delete [] vert_alloc;
-			free(vert_alloc);
+            std::free(vert_alloc);
+            vert_alloc = 0;
 		}
 
-		delete this;
+		//delete this;
 	}
 
 	// num of points passed to last call to Triangulate()
@@ -3729,8 +3733,8 @@ struct CDelaBella2 : IDelaBella2<T, I>
 			{
 				assert(h->f[2] == f);
 				assert(nf == h->GetEdgeBits(2));
-			}	
-			else 
+			}
+			else
 			if (h->v[1] == b && h->v[2] == a)
 			{
 				assert(h->f[0] == f);
