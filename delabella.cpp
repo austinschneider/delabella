@@ -3304,7 +3304,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
             vert_alloc = 0;
 		}
 
-		//delete this;
+		delete this;
 	}
 
 	// num of points passed to last call to Triangulate()
