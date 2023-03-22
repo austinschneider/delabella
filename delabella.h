@@ -29,8 +29,8 @@ struct IDelaBella2
 		Simplex* f[3]; // 3 adjacent faces, f[i] is at the edge opposite to vertex v[i]
 		Simplex* next; // next triangle (of delaunay set or hull set)
 		I index;       // list index
-		
-		unsigned char flags; 
+
+		unsigned char flags;
 
 		bool IsDelaunay() const
 		{
@@ -103,11 +103,11 @@ struct IDelaBella2
 
 	virtual void SetErrLog(int(*proc)(void* stream, const char* fmt, ...), void* stream) = 0;
 
-	// return 0: no output 
+	// return 0: no output
 	// negative: all points are colinear, output hull vertices form colinear segment list, no triangles on output
 	// positive: output hull vertices form counter-clockwise ordered segment contour, delaunay and hull triangles are available
 	// if 'y' pointer is null, y coords are treated to be located immediately after every x
-	// if advance_bytes is less than 2*sizeof coordinate type, it is treated as 2*sizeof coordinate type  
+	// if advance_bytes is less than 2*sizeof coordinate type, it is treated as 2*sizeof coordinate type
 	virtual I Triangulate(I points, const T* x, const T* y = 0, size_t advance_bytes = 0, I stop = -1) = 0;
 
 	// num of points passed to last call to Triangulate()
@@ -131,10 +131,10 @@ struct IDelaBella2
 
 	virtual const Simplex* GetFirstDelaunaySimplex() const = 0; // valid only if Triangulate() > 0
 	virtual const Simplex* GetFirstHullSimplex() const = 0; // valid only if Triangulate() > 0
-	virtual const Vertex*  GetFirstBoundaryVertex() const = 0; // if Triangulate() < 0 it is list, otherwise closed contour! 
+	virtual const Vertex*  GetFirstBoundaryVertex() const = 0; // if Triangulate() < 0 it is list, otherwise closed contour!
 	virtual const Vertex*  GetFirstInternalVertex() const = 0; // valid only if Triangulate() > 0
 
-	// given input point index, returns corresponding vertex pointer 
+	// given input point index, returns corresponding vertex pointer
 	virtual const Vertex*  GetVertexByIndex(I i) const = 0;
 
 	// insert constraint edges into triangulation, valid only if Triangulate() > 0
@@ -149,10 +149,10 @@ struct IDelaBella2
 	// groups adjacent faces, not separated by constraint edges, built on concyclic vertices into polygons
 	// first 3 vertices of a polygon are all 3 vertices of first face Simplex::v[0], v[1], v[2]
 	// every next face in polygon defines additional 1 polygon vertex at its Simplex::v[0]
-	// usefull as preprocessing step before genereating voronoi diagrams 
+	// usefull as preprocessing step before genereating voronoi diagrams
 	// and as unification step before comparing 2 or more triangulations
 	// valid only if Triangulate() > 0
-	virtual I Polygonize(const Simplex* poly[/*GetNumOutputIndices()/3*/] = 0) = 0; 
+	virtual I Polygonize(const Simplex* poly[/*GetNumOutputIndices()/3*/] = 0) = 0;
 
 	// GenVoronoiDiagramVerts(), valid only if Triangulate() > 0
 	// it makes sense to call it prior to constraining only
@@ -198,7 +198,7 @@ struct IDelaBella2
 	// next N polys in <indices> represent open VD cells, thay are in order
 	// and corresponding to vertices from GetFirstBoundaryVertex() -> Vertex::next list
 	// every poly written to <indices> is terminated with ~0 value
-	// if both <indices> and <closed_indices> are not null, 
+	// if both <indices> and <closed_indices> are not null,
 	// number of closed VD cells indices is written to <closed_indices>
 	// function returns number of indices filled (I) on success, otherwise 0
 	virtual I GenVoronoiDiagramPolys(I* indices, size_t advance_bytes=0, I* closed_indices=0) const = 0;

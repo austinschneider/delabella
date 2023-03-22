@@ -36,28 +36,6 @@ uint64_t sorting_bench = 0;
 #include <windows.h>
 #endif
 
-static uint64_t uSec()
-{
-#ifdef _WIN32
-	LARGE_INTEGER c;
-	static LARGE_INTEGER f;
-	static BOOL bf = QueryPerformanceFrequency(&f);
-	QueryPerformanceCounter(&c);
-	uint64_t n = c.QuadPart;
-	uint64_t d = f.QuadPart;
-	uint64_t m = 1000000;
-	// calc microseconds = n*m/d carefully!
-	// naive mul/div would work only for upto 5h on 1GHz freq
-	// we exploit fact that m*d fits in uint64 (upto 18THz freq)
-	// so n%d*m fits as well,
-	return n / d * m + n % d * m / d;
-#else
-	timespec ts;
-	clock_gettime(CLOCK_MONOTONIC, &ts);
-	return (uint64_t)ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
-#endif
-}
-
 template <typename T, typename I>
 IDelaBella2<T, I>::~IDelaBella2()
 {
@@ -336,9 +314,9 @@ struct CDelaBella2 : IDelaBella2<T, I>
 	int (*errlog_proc)(void *file, const char *fmt, ...);
 	void *errlog_file;
 
-	I Prepare(I *start, Face **hull, I *out_hull_faces, Face **cache, uint64_t *sort_stamp, I stop)
+	I Prepare(I *start, Face **hull, I *out_hull_faces, Face **cache, I stop)
 	{
-		//uint64_t time0 = uSec();
+		//uint64_t ();
 
 		//if (errlog_proc)
 		//	errlog_proc(errlog_file, "[...] sorting vertices");
@@ -468,14 +446,6 @@ struct CDelaBella2 : IDelaBella2<T, I>
 			#endif
 
 
-			uint64_t time1 = uSec();
-
-			sorting_bench = time1 - *sort_stamp;
-
-			if (errlog_proc)
-				errlog_proc(errlog_file, "\r[100] sorting vertices (%lld ms)\n", (time1 - *sort_stamp) / 1000);
-
-			*sort_stamp = time1;
 
 			if (points - w)
 			{
@@ -977,14 +947,14 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		return points;
 	}
 
-	I Triangulate(I *other_faces, uint64_t* sort_stamp, I stop)
+	I Triangulate(I *other_faces, I stop)
 	{
 		I i = 0;
 		Face *hull = 0;
 		I hull_faces = 0;
 		Face *cache = 0;
 
-		I points = Prepare(&i, &hull, &hull_faces, &cache, sort_stamp, stop);
+		I points = Prepare(&i, &hull, &hull_faces, &cache, stop);
 		unique_points = points < 0 ? -points : points;
 		if (points <= 0)
 		{
@@ -1284,9 +1254,6 @@ struct CDelaBella2 : IDelaBella2<T, I>
 				prev_inter = (Vert **)&next->next;
 			}
 		}
-
-		if (errlog_proc)
-			errlog_proc(errlog_file, "\r[100] convex hull triangulation (%lld ms)\n", (uSec() - *sort_stamp) / 1000);
 
 		return 3 * i;
 	}
@@ -1597,8 +1564,6 @@ struct CDelaBella2 : IDelaBella2<T, I>
 			advance_bytes = 2 * sizeof(I);
 
 		int unfixed = 0;
-
-		uint64_t time0 = uSec();
 
 		int pro = 0;
 		for (I con = 0; con < edges; con++)
@@ -2154,7 +2119,6 @@ struct CDelaBella2 : IDelaBella2<T, I>
 
 		if (errlog_proc)
 		{
-			errlog_proc(errlog_file, "\r[100] constraining (%lld ms)\n", (uSec() - time0) / 1000);
 			if (unfixed)
 				errlog_proc(errlog_file, "\r[WRN] %d crossing edges detected - unfixed\n", unfixed);
 		}
@@ -2166,8 +2130,6 @@ struct CDelaBella2 : IDelaBella2<T, I>
 	{
 		if (!first_dela_face)
 			return 0;
-
-		uint64_t time0 = uSec();
 
 		if (errlog_proc)
 			errlog_proc(errlog_file, "[...] flood filling ");
@@ -2446,9 +2408,6 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		if (exterior)
 			*exterior = first_exterior_face;
 
-		if (errlog_proc)
-			errlog_proc(errlog_file, "\r[100] flood filling (%lld ms)\n", (uSec() - time0) / 1000);
-
 		return interior;
 	}
 
@@ -2456,7 +2415,6 @@ struct CDelaBella2 : IDelaBella2<T, I>
 	{
 		const I marker = (I)(-1);
 
-		uint64_t time0 = uSec();
 		Face **buf = 0;
 		if (!poly)
 		{
@@ -2738,16 +2696,11 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		if (buf)
 			std::free(buf);
 
-		if (errlog_proc)
-			errlog_proc(errlog_file, "\r[100] polygonizing (%lld ms)\n", (uSec() - time0) / 1000);
-
 		return num;
 	}
 
 	virtual I Triangulate(I points, const T *x, const T *y, size_t advance_bytes, I stop)
 	{
-		uint64_t sort_stamp = uSec();
-
 		// const size_t max_triangulate_indices = (size_t)points * 6 - 15;
 		// const size_t max_voronoi_edge_indices = (size_t)points * 6 - 12;
 		const size_t max_voronoi_poly_indices = (size_t)points * 7 - 9; // winner of shame!
@@ -3278,7 +3231,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 
 		out_hull_faces = 0;
 		unique_points = 0;
-		out_verts = Triangulate(&out_hull_faces, &sort_stamp, stop);
+		out_verts = Triangulate(&out_hull_faces, stop);
 		polygons = out_verts / 3;
 		return out_verts;
 	}
