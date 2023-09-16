@@ -2126,7 +2126,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		return polygons;
 	}
 
-	virtual I FloodFill(bool invert, const typename IDelaBella2<T, I>::Simplex **exterior)
+	virtual I FloodFill(bool invert, const typename IDelaBella2<T, I>::Simplex **exterior, int depth)
 	{
 		if (!first_dela_face)
 			return 0;
@@ -2134,6 +2134,8 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		if (errlog_proc)
 			errlog_proc(errlog_file, "[...] flood filling ");
 
+		if (depth <= 0)
+			depth = -1;
 
 		const I marker = -1;
 		const I seeded = -2;
@@ -2145,6 +2147,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 
 		Face *seed = 0;
 		Face *flip = 0;
+		Face* flip_tail = 0;
 
 		Vert *v = first_boundary_vert;
 		Vert *e = v;
@@ -2200,7 +2203,6 @@ struct CDelaBella2 : IDelaBella2<T, I>
 				}
 			}
 			else
-			if (!seed)
 			{
 				// make sure we dont seed same dela twice
 				if (dela->index != seeded)
@@ -2208,6 +2210,8 @@ struct CDelaBella2 : IDelaBella2<T, I>
 					dela->index = seeded;
 					dela->next = flip;
 					flip = dela;
+					if (!flip_tail)
+						flip_tail = flip;
 				}
 			}
 
@@ -2221,22 +2225,16 @@ struct CDelaBella2 : IDelaBella2<T, I>
 			seed = flip;
 			flip = 0;
 			fill ^= 0b01000000;
-		}
-		else
-		{
-			Face *f = flip;
-			while (f)
-			{
-				f->index = 0; // clear seeded
-				f = (Face *)f->next;
-			}
+			flip_tail = 0;
+
+			depth--;
 		}
 
 		int acc = 0;
 		int pro = 0;
 		int tot = (int)out_verts / 3;
 
-		while (seed)
+		while (seed && depth)
 		{
 			Face *stack = seed;
 			seed = 0;
@@ -2266,6 +2264,14 @@ struct CDelaBella2 : IDelaBella2<T, I>
 						errlog_proc(errlog_file, "\r[%2d%s] flood filling ", p, p >= 100 ? "" : "%");
 				}
 			}
+
+			if (flip)
+			{
+				flip_tail->next = seed;
+				seed = flip;
+				flip = 0;
+				flip_tail = 0;
+			}			
 
 			// 2. until stack is not empty
 			//    - pop 1 face from stack
@@ -2340,6 +2346,7 @@ struct CDelaBella2 : IDelaBella2<T, I>
 			//    - flip current fill mode
 			//    - jump to 1.
 
+			depth--;
 			fill ^= 0b01000000;
 		}
 
@@ -2369,8 +2376,15 @@ struct CDelaBella2 : IDelaBella2<T, I>
 		for (int i = 0; i < faces; i++)
 		{
 			Face *f = face_alloc + i;
+
 			if (f->IsDelaunay())
 			{
+
+				if (f->index != marker)
+				{
+					f->flags = (f->flags & ~0b01000000) | fill;
+				}
+
 				if (f->flags & 0b01000000)
 				{
 					if (!interior)
