@@ -16,6 +16,7 @@ set_property(TARGET delabella PROPERTY POSITION_INDEPENDENT_CODE ON)
 if(DELABELLA_BUILD_SHARED)
     add_library(delabella_shared SHARED $<TARGET_OBJECTS:delabella>)
     set_target_properties(delabella_shared PROPERTIES OUTPUT_NAME delabella POSITION_INDEPENDENT_CODE ON)
+    set_target_properties(delabella_shared PROPERTIES EXPORT_NAME delabella)
     target_include_directories(delabella_shared PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
@@ -28,6 +29,7 @@ endif()
 if(DELABELLA_STATIC)
     add_library(delabella_static STATIC $<TARGET_OBJECTS:delabella>)
     set_target_properties(delabella_static PROPERTIES OUTPUT_NAME delabella POSITION_INDEPENDENT_CODE ON)
+    set_target_properties(delabella_static PROPERTIES EXPORT_NAME delabella)
     target_include_directories(delabella_static PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
