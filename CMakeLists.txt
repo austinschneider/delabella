@@ -1,6 +1,3 @@
-cmake_minimum_required(VERSION 2.6)
-cmake_policy(SET CMP0048 "NEW")
-
 project(delabella LANGUAGES CXX VERSION 1.0)
 
 
