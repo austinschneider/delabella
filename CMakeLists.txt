@@ -23,7 +23,7 @@ if(DELABELLA_BUILD_SHARED)
         ARCHIVE DESTINATION lib)
 endif()
 
-if(DELABELLA_STATIC)
+if(DELABELLA_BUILD_STATIC)
     add_library(delabella_static STATIC $<TARGET_OBJECTS:delabella>)
     set_target_properties(delabella_static PROPERTIES OUTPUT_NAME delabella POSITION_INDEPENDENT_CODE ON)
     set_target_properties(delabella_static PROPERTIES EXPORT_NAME delabella)
